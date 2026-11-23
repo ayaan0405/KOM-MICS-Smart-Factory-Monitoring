@@ -1,0 +1,1140 @@
+/* ==========================================================================
+   KOM-MICS INDUSTRIAL SMART FACTORY MONITORING WORKSTATION
+   Authentic Industrial HMI / MES Architecture (Komatsu-Inspired Visuals)
+   Academic Prototype • Non-Commercial Project
+   ========================================================================== */
+
+:root {
+    /* Komatsu Brand Specifications */
+    --k-yellow: #F5B800;
+    --k-yellow-dark: #D49E00;
+    --k-yellow-light: #FFF4D1;
+
+    /* Light Industrial Surfaces & Borders */
+    --bg-workspace: #E9EAEC;
+    --bg-surface: #FFFFFF;
+    --bg-inset: #F4F5F7;
+    --bg-header-band: #002D62; /* Komatsu Corporate Deep Blue */
+    --bg-header-sub: #001F44;
+    --bg-table-head: #ECEFF2;
+    --bg-table-hover: #F1F4F7;
+    --bg-table-zebra: #F9FAFB;
+
+    /* Technical Thin Borders */
+    --border-line: #D0D3D6;
+    --border-dark: #B8BCBE;
+    --border-focus: #002D62;
+
+    /* Charcoal Typography */
+    --text-primary: #1A1D20;
+    --text-secondary: #4B5259;
+    --text-muted: #6C747C;
+    --text-white: #FFFFFF;
+
+    /* Operational Andon Palette */
+    --andon-run: #16A34A;
+    --andon-run-bg: #DCFCE7;
+    --andon-run-border: #15803D;
+
+    --andon-idle: #D97706;
+    --andon-idle-bg: #FEF3C7;
+    --andon-idle-border: #B45309;
+
+    --andon-warn: #DC2626;
+    --andon-warn-bg: #FEE2E2;
+    --andon-warn-border: #B91C1C;
+
+    --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: "Consolas", "Roboto Mono", "Courier New", monospace;
+
+    --radius-box: 1px;
+}
+
+/* --- Base & Reset --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body.komatsu-workstation {
+    background-color: var(--bg-workspace);
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+}
+
+.hmi-top-accent {
+    height: 3px;
+    background-color: var(--k-yellow);
+    width: 100%;
+}
+
+.hmi-frame {
+    max-width: 1560px;
+    margin: 0 auto;
+    padding: 8px 12px 24px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* --- 1. Compact Horizontal Console Header --- */
+.hmi-header {
+    background-color: var(--bg-header-band);
+    color: var(--text-white);
+    border: 1px solid var(--border-line);
+    padding: 8px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    border-radius: var(--radius-box);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.komatsu-brand-pill {
+    background-color: var(--k-yellow);
+    color: #000000;
+    padding: 4px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-box);
+}
+
+.brand-name {
+    font-weight: 900;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    line-height: 1;
+}
+
+.brand-tag {
+    font-size: 0.52rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    line-height: 1;
+}
+
+.header-titles {
+    display: flex;
+    flex-direction: column;
+}
+
+.system-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    color: var(--text-white);
+}
+
+.system-sub {
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    color: var(--k-yellow);
+    letter-spacing: 0.04em;
+}
+
+.header-context {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.ctx-item {
+    background-color: var(--bg-header-sub);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 4px 8px;
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: var(--radius-box);
+}
+
+.ctx-k {
+    color: #94A3B8;
+    font-weight: 700;
+}
+
+.ctx-v {
+    color: var(--text-white);
+    font-weight: 700;
+}
+
+.comm-online {
+    color: #4ADE80;
+}
+
+.ctx-clock {
+    color: var(--k-yellow);
+    font-weight: 700;
+}
+
+.btn-sync {
+    background-color: var(--k-yellow);
+    color: #000000;
+    border: 1px solid var(--k-yellow-dark);
+    padding: 5px 12px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border-radius: var(--radius-box);
+    transition: background-color 0.15s ease;
+}
+
+.btn-sync:hover {
+    background-color: #E0A700;
+}
+
+/* --- 2. Primary Navigation Bar --- */
+.hmi-nav {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-line);
+    padding: 3px 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: var(--radius-box);
+}
+
+.nav-section-tabs {
+    display: flex;
+    gap: 2px;
+}
+
+.nav-btn {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+    padding: 6px 14px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: var(--font-sans);
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    border-radius: var(--radius-box);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.12s ease;
+}
+
+.nav-num {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+}
+
+.nav-btn:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-table-hover);
+}
+
+.nav-btn.active {
+    background-color: var(--bg-surface);
+    color: #000000;
+    font-weight: 800;
+    border: 1px solid var(--border-line);
+    border-top: 3px solid var(--k-yellow);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.alarm-count-badge {
+    background-color: var(--andon-warn);
+    color: var(--text-white);
+    font-size: 0.64rem;
+    font-family: var(--font-mono);
+    padding: 1px 5px;
+    border-radius: var(--radius-box);
+}
+
+.nav-sim-badge {
+    font-size: 0.68rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--text-muted);
+    padding: 0 8px;
+}
+
+/* --- View Panel Control --- */
+.view-panel {
+    display: none;
+}
+
+.view-panel.active {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* --- Common Industrial Panels & Tables --- */
+.panel-box {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-line);
+    border-radius: var(--radius-box);
+    overflow: hidden;
+}
+
+.panel-head-bar {
+    background-color: var(--bg-inset);
+    border-bottom: 1px solid var(--border-line);
+    padding: 6px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 3px solid var(--bg-header-band);
+}
+
+.p-title {
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: var(--text-primary);
+}
+
+.p-meta {
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.76rem;
+    text-align: left;
+}
+
+.data-table th {
+    background-color: var(--bg-table-head);
+    color: var(--text-secondary);
+    font-weight: 800;
+    font-size: 0.66rem;
+    letter-spacing: 0.06em;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border-line);
+}
+
+.data-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border-line);
+    color: var(--text-primary);
+}
+
+.data-table tbody tr:hover td {
+    background-color: var(--bg-table-hover);
+}
+
+.loading-td {
+    text-align: center;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    padding: 16px !important;
+}
+
+/* --- SECTION 1: PLANT OVERVIEW --- */
+.kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-line);
+    border-radius: var(--radius-box);
+}
+
+.kpi-cell {
+    padding: 8px 14px;
+    border-right: 1px solid var(--border-line);
+    border-top: 3px solid var(--border-dark);
+    display: flex;
+    flex-direction: column;
+}
+
+.kpi-cell:last-child {
+    border-right: none;
+}
+
+.kpi-cell.cell-run { border-top-color: var(--andon-run-border); }
+.kpi-cell.cell-avail { border-top-color: var(--bg-header-band); }
+
+.kpi-head {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.kpi-body {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin: 2px 0;
+}
+
+.kpi-val {
+    font-size: 1.6rem;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+    color: var(--text-primary);
+}
+
+.text-green { color: var(--andon-run); }
+.text-navy { color: var(--bg-header-band); }
+
+.kpi-unit {
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.kpi-foot {
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+}
+
+/* Timeline Strip (Gantt-style machine status blocks) */
+.timeline-strip {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+    padding: 8px 10px;
+    background-color: var(--bg-inset);
+}
+
+.timeline-unit {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-line);
+    border-left: 3px solid var(--border-dark);
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.timeline-unit.st-running { border-left-color: var(--andon-run); }
+.timeline-unit.st-idle { border-left-color: var(--andon-idle); }
+.timeline-unit.st-warning { border-left-color: var(--andon-warn); }
+
+.tl-id {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.tl-name {
+    font-size: 0.74rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tl-badge {
+    font-size: 0.62rem;
+    font-family: var(--font-mono);
+    font-weight: 800;
+    padding: 1px 4px;
+    border-radius: var(--radius-box);
+    display: inline-block;
+    align-self: flex-start;
+    margin-top: 2px;
+}
+
+.overview-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: 8px;
+}
+
+.charts-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.chart-sub {
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-canvas-wrap {
+    position: relative;
+    height: 180px;
+    width: 100%;
+    padding: 6px 10px;
+}
+
+/* --- SECTION 2: MACHINE MATRIX & INSPECTOR DRAWER --- */
+.matrix-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 8px;
+    align-items: start;
+}
+
+.matrix-filter-bar {
+    background-color: var(--bg-inset);
+    border-bottom: 1px solid var(--border-line);
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.search-label, .chip-label {
+    font-size: 0.66rem;
+    font-family: var(--font-mono);
+    font-weight: 800;
+    color: var(--text-muted);
+}
+
+.search-input {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-line);
+    color: var(--text-primary);
+    padding: 4px 8px;
+    font-size: 0.74rem;
+    font-family: var(--font-ui);
+    width: 200px;
+    border-radius: var(--radius-box);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--border-focus);
+}
+
+.chip-group {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.filter-chip, .status-chip, .alarm-sev-btn, .alarm-st-btn {
+    background-color: var(--bg-surface);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-line);
+    padding: 3px 7px;
+    font-size: 0.68rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: var(--radius-box);
+}
+
+.filter-chip:hover, .status-chip:hover, .alarm-sev-btn:hover, .alarm-st-btn:hover {
+    background-color: var(--bg-table-hover);
+}
+
+.filter-chip.active, .status-chip.active, .alarm-sev-btn.active, .alarm-st-btn.active {
+    background-color: var(--bg-header-band);
+    color: var(--text-white);
+    border-color: var(--bg-header-band);
+}
+
+/* Machine Matrix Table Rows */
+.matrix-row {
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.matrix-row.selected {
+    background-color: var(--k-yellow-light) !important;
+}
+
+.btn-inspect {
+    background-color: var(--bg-surface);
+    color: var(--bg-header-band);
+    border: 1px solid var(--border-line);
+    padding: 2px 6px;
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: var(--radius-box);
+}
+
+.btn-inspect:hover {
+    background-color: var(--bg-header-band);
+    color: var(--text-white);
+}
+
+/* Inspector Drawer (Side Panel) */
+.matrix-inspector-drawer {
+    display: flex;
+    flex-direction: column;
+}
+
+.drawer-head {
+    border-left-color: var(--k-yellow);
+}
+
+.btn-drawer-close {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.btn-drawer-close:hover {
+    color: var(--text-primary);
+}
+
+.drawer-body {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 0.74rem;
+}
+
+.empty-inspector-msg {
+    color: var(--text-muted);
+    padding: 24px 10px;
+    text-align: center;
+    font-family: var(--font-mono);
+}
+
+.inspector-profile {
+    border: 1px solid var(--border-line);
+    background-color: var(--bg-inset);
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.insp-name {
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.insp-detail-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+}
+
+.inspector-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 1px solid var(--border-line);
+    background-color: var(--bg-surface);
+    text-align: center;
+}
+
+.insp-metric-col {
+    padding: 6px 4px;
+}
+
+.insp-metric-col:not(:last-child) {
+    border-right: 1px solid var(--border-line);
+}
+
+.insp-m-label {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    font-weight: 800;
+}
+
+.insp-m-val {
+    font-size: 1.05rem;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    margin-top: 1px;
+}
+
+.inspector-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+}
+
+.inspector-history-table th {
+    background-color: var(--bg-table-head);
+    color: var(--text-secondary);
+    padding: 4px 6px;
+    border-bottom: 1px solid var(--border-line);
+    text-align: left;
+}
+
+.inspector-history-table td {
+    padding: 4px 6px;
+    border-bottom: 1px solid var(--border-line);
+}
+
+/* --- SECTION 3: ALARMS & EVENTS --- */
+.alarm-filter-bar {
+    background-color: var(--bg-inset);
+    border-bottom: 1px solid var(--border-line);
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.sev-tag {
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: var(--radius-box);
+    display: inline-block;
+}
+
+.sev-WARNING {
+    background-color: var(--andon-warn-bg);
+    color: var(--andon-warn);
+    border: 1px solid var(--andon-warn-border);
+}
+
+.sev-INFO {
+    background-color: #E0F2FE;
+    color: #0369A1;
+    border: 1px solid #7DD3FC;
+}
+
+.alarm-st-tag {
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: var(--radius-box);
+    display: inline-block;
+}
+
+.ast-ACTIVE {
+    background-color: var(--andon-warn-bg);
+    color: var(--andon-warn);
+    border: 1px solid var(--andon-warn-border);
+}
+
+.ast-ACKNOWLEDGED {
+    background-color: var(--andon-idle-bg);
+    color: var(--andon-idle);
+    border: 1px solid var(--andon-idle-border);
+}
+
+.ast-RESOLVED {
+    background-color: var(--andon-run-bg);
+    color: var(--andon-run);
+    border: 1px solid var(--andon-run-border);
+}
+
+.btn-ack {
+    background-color: var(--bg-surface);
+    color: var(--andon-idle);
+    border: 1px solid var(--andon-idle-border);
+    padding: 2px 6px;
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    font-weight: 800;
+    cursor: pointer;
+    border-radius: var(--radius-box);
+    margin-right: 3px;
+}
+
+.btn-ack:hover {
+    background-color: var(--andon-idle-bg);
+}
+
+.btn-resolve {
+    background-color: var(--bg-surface);
+    color: var(--andon-run);
+    border: 1px solid var(--andon-run-border);
+    padding: 2px 6px;
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    font-weight: 800;
+    cursor: pointer;
+    border-radius: var(--radius-box);
+}
+
+.btn-resolve:hover {
+    background-color: var(--andon-run-bg);
+}
+
+/* Status Tags (Andon) */
+.status-tag {
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: var(--radius-box);
+    display: inline-block;
+    text-transform: uppercase;
+}
+
+.status-RUNNING {
+    background-color: var(--andon-run-bg);
+    color: var(--andon-run);
+    border: 1px solid var(--andon-run-border);
+}
+
+.status-IDLE {
+    background-color: var(--andon-idle-bg);
+    color: var(--andon-idle);
+    border: 1px solid var(--andon-idle-border);
+}
+
+.status-WARNING {
+    background-color: var(--andon-warn-bg);
+    color: var(--andon-warn);
+    border: 1px solid var(--andon-warn-border);
+}
+
+.alert-val {
+    color: var(--andon-warn) !important;
+    font-weight: 800;
+}
+
+/* --- Console Footer --- */
+.hmi-footer {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-line);
+    padding: 6px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    border-radius: var(--radius-box);
+}
+
+.footer-left {
+    font-size: 0.66rem;
+    color: var(--text-secondary);
+}
+
+.footer-left strong {
+    color: var(--bg-header-band);
+}
+
+.footer-right {
+    font-size: 0.64rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+}
+
+/* --- Responsive Layout --- */
+@media (max-width: 1100px) {
+    .overview-grid {
+        grid-template-columns: 1fr;
+    }
+    .matrix-layout {
+        grid-template-columns: 1fr;
+    }
+    .kpi-strip {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .timeline-strip {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 680px) {
+    .kpi-strip {
+        grid-template-columns: 1fr;
+    }
+    .timeline-strip {
+        grid-template-columns: 1fr;
+    }
+    .hmi-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* ==========================================================================
+   PRODUCTION SUMMARY (SIMULATED SHIFT DATA)
+   ========================================================================== */
+.prod-progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.prod-progress-track {
+    flex: 1;
+    height: 12px;
+    background-color: var(--border-line);
+    border: 1px solid var(--border-focus);
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-box);
+}
+
+.prod-progress-fill {
+    height: 100%;
+    background-color: var(--k-yellow);
+    border-right: 2px solid var(--bg-header-band);
+    transition: width 0.3s ease;
+}
+
+.prod-progress-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    min-width: 44px;
+    text-align: right;
+    color: var(--text-primary);
+}
+
+/* ==========================================================================
+   MAINTENANCE TRACKER & MODAL DIALOG
+   ========================================================================== */
+.maint-type-btn {
+    background-color: var(--bg-surface);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-line);
+    padding: 3px 8px;
+    font-size: 0.68rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: var(--radius-box);
+}
+
+.maint-type-btn:hover {
+    background-color: var(--bg-table-hover);
+}
+
+.maint-type-btn.active {
+    background-color: var(--bg-header-band);
+    color: var(--text-white);
+    border-color: var(--bg-header-band);
+}
+
+.maint-tag {
+    font-size: 0.64rem;
+    font-family: var(--font-mono);
+    font-weight: 800;
+    padding: 2px 5px;
+    border-radius: var(--radius-box);
+    display: inline-block;
+    text-transform: uppercase;
+}
+
+.maint-PREVENTIVE {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+}
+
+.maint-CORRECTIVE {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.maint-TOOL_CHANGE {
+    background-color: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.maint-INSPECTION {
+    background-color: #f3e8ff;
+    color: #7e22ce;
+    border: 1px solid #e9d5ff;
+}
+
+.maint-CALIBRATION {
+    background-color: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+.maint-EMERGENCY {
+    background-color: #ffe4e6;
+    color: #be123c;
+    border: 1px solid #fecdd3;
+}
+
+/* Modal Backdrop */
+.hmi-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(26, 29, 32, 0.65);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+/* Modal Window */
+.hmi-modal {
+    background-color: var(--bg-surface);
+    border: 2px solid var(--border-focus);
+    border-top: 4px solid var(--k-yellow);
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    border-radius: var(--radius-box);
+}
+
+.hmi-modal-header {
+    background-color: var(--bg-surface-alt);
+    border-bottom: 1px solid var(--border-line);
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-title {
+    font-size: 0.8rem;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    color: var(--bg-header-band);
+    letter-spacing: 0.05em;
+}
+
+.hmi-modal-body {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.form-row-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.form-label {
+    font-size: 0.68rem;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+}
+
+.form-select, .form-input, .form-textarea {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--border-line);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 0.76rem;
+    font-family: var(--font-mono);
+    border-radius: var(--radius-box);
+    outline: none;
+}
+
+.form-select:focus, .form-input:focus, .form-textarea:focus {
+    border-color: var(--bg-header-band);
+    background-color: #fff;
+}
+
+.hmi-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-line);
+}
+
+.btn-cancel {
+    background-color: var(--bg-surface);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-line);
+    padding: 6px 12px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    cursor: pointer;
+    border-radius: var(--radius-box);
+}
+
+.btn-cancel:hover {
+    background-color: var(--bg-table-hover);
+}
+
+.btn-submit-maint {
+    background-color: var(--k-yellow);
+    color: var(--bg-header-band);
+    border: 1px solid #d49e00;
+    padding: 6px 14px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    cursor: pointer;
+    border-radius: var(--radius-box);
+}
+
+.btn-submit-maint:hover {
+    background-color: #e5a700;
+}
+
+/* Machine Detail Drawer Maintenance Section */
+.drawer-maint-btn {
+    width: 100%;
+    background-color: var(--bg-header-band);
+    color: var(--text-white);
+    border: 1px solid var(--bg-header-band);
+    padding: 5px 8px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    cursor: pointer;
+    margin-top: 8px;
+    border-radius: var(--radius-box);
+    text-align: center;
+}
+
+.drawer-maint-btn:hover {
+    background-color: #001f44;
+}
+

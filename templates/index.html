@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOM-MICS Smart Factory Operations Workstation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/chart.umd.min.js') }}"></script>
+</head>
+<body class="komatsu-workstation">
+    <!-- Top Brand Accent -->
+    <div class="hmi-top-accent"></div>
+
+    <div class="hmi-frame">
+        <!-- 1. Compact Horizontal Console Header -->
+        <header class="hmi-header">
+            <div class="header-left">
+                <div class="komatsu-brand-pill">
+                    <span class="brand-name">KOMATSU</span>
+                    <span class="brand-tag">INSPIRED</span>
+                </div>
+                <div class="header-titles">
+                    <h1 class="system-title">KOM-MICS | SMART FACTORY MONITORING SYSTEM</h1>
+                    <span class="system-sub">ACADEMIC RESEARCH PROTOTYPE • INSPIRED BY KOMATSU MIERUKA IIOT ARCHITECTURE</span>
+                </div>
+            </div>
+
+            <!-- Plant & Shift Context -->
+            <div class="header-context">
+                <div class="ctx-item">
+                    <span class="ctx-k">PLANT:</span>
+                    <span class="ctx-v">KOMATSU-INSPIRED CELL 01</span>
+                </div>
+                <div class="ctx-item">
+                    <span class="ctx-k">SHIFT:</span>
+                    <span class="ctx-v">SHIFT 1 (DAY)</span>
+                </div>
+                <div class="ctx-item">
+                    <span class="ctx-k">COMM:</span>
+                    <span class="ctx-v comm-online">● ONLINE</span>
+                </div>
+                <div class="ctx-item ctx-clock" id="last-updated-text">
+                    LAST SYNC: --:--:--
+                </div>
+                <button id="btn-refresh" class="btn-sync" title="Synchronize Telemetry">
+                    SYNC NOW
+                </button>
+            </div>
+        </header>
+
+        <!-- 2. Primary Navigation Bar (Three Functional Sections) -->
+        <nav class="hmi-nav">
+            <div class="nav-section-tabs">
+                <button class="nav-btn active" data-tab="overview">
+                    <span class="nav-num">01.</span> PLANT OVERVIEW
+                </button>
+                <button class="nav-btn" data-tab="matrix">
+                    <span class="nav-num">02.</span> MACHINE MATRIX
+                </button>
+                <button class="nav-btn" data-tab="alarms">
+                    <span class="nav-num">03.</span> ALARMS & EVENTS <span class="alarm-count-badge" id="badge-alarm-count">0</span>
+                </button>
+                <button class="nav-btn" data-tab="maintenance">
+                    <span class="nav-num">04.</span> MAINTENANCE LOGS
+                </button>
+            </div>
+            <div class="nav-sim-badge">
+                [SIMULATED SENSOR TELEMETRY]
+            </div>
+        </nav>
+
+        <!-- ==================================================================
+             SECTION 1: PLANT OVERVIEW
+             ================================================================== -->
+        <section id="view-overview" class="view-panel active">
+            <!-- Compact Horizontal KPI Summary (No Oversized Cards) -->
+            <div class="kpi-strip" id="section-kpis">
+                <!-- KPI 1: Monitored Units -->
+                <div class="kpi-cell" id="kpi-total-machines">
+                    <span class="kpi-head">MONITORED ASSETS</span>
+                    <div class="kpi-body">
+                        <span class="kpi-val" id="val-total-machines">--</span>
+                        <span class="kpi-unit">UNITS</span>
+                    </div>
+                    <span class="kpi-foot">3 Plant Departments</span>
+                </div>
+
+                <!-- KPI 2: Running Units -->
+                <div class="kpi-cell cell-run" id="kpi-running-machines">
+                    <span class="kpi-head">OPERATING (RUNNING)</span>
+                    <div class="kpi-body">
+                        <span class="kpi-val text-green" id="val-running-machines">--</span>
+                        <span class="kpi-unit text-green">ACTIVE</span>
+                    </div>
+                    <span class="kpi-foot" id="sub-running-status">-- Idle | -- Warning</span>
+                </div>
+
+                <!-- KPI 3: Availability -->
+                <div class="kpi-cell cell-avail" id="kpi-availability">
+                    <span class="kpi-head">PLANT AVAILABILITY</span>
+                    <div class="kpi-body">
+                        <span class="kpi-val text-navy" id="val-availability">--%</span>
+                        <span class="kpi-unit">RATIO</span>
+                    </div>
+                    <span class="kpi-foot" title="Formula: (Running Units / Total Machines) × 100">Formula: (Running / Total) × 100</span>
+                </div>
+
+                <!-- KPI 4: Telemetry Samples -->
+                <div class="kpi-cell" id="kpi-telemetry">
+                    <span class="kpi-head">TELEMETRY SAMPLES</span>
+                    <div class="kpi-body">
+                        <span class="kpi-val" id="val-telemetry">--</span>
+                        <span class="kpi-unit">RECORDS</span>
+                    </div>
+                    <span class="kpi-foot">SQLite WAL Time-Series Archive</span>
+                </div>
+            </div>
+
+            <!-- Machine Operating Status Timeline (Visual Andon Status Bar) -->
+            <div class="panel-box">
+                <div class="panel-head-bar">
+                    <span class="p-title">EQUIPMENT OPERATING STATUS TIMELINE</span>
+                    <span class="p-meta">REAL-TIME ANDON OPERATIONAL STATES ACROSS ALL ASSETS</span>
+                </div>
+                <div class="timeline-strip" id="operating-status-timeline">
+                    <!-- Populated dynamically: 6 machine status blocks -->
+                </div>
+            </div>
+
+            <!-- Department Status Table & Production/Telemetry Trends -->
+            <div class="overview-grid">
+                <!-- Department Status Table -->
+                <div class="panel-box">
+                    <div class="panel-head-bar">
+                        <span class="p-title">DEPARTMENT OPERATIONAL STATUS TABLE</span>
+                        <span class="p-meta">SECTOR SUMMARY & THERMAL LOAD</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="data-table" id="department-status-table">
+                            <thead>
+                                <tr>
+                                    <th>MANUFACTURING DEPARTMENT</th>
+                                    <th>TOTAL UNITS</th>
+                                    <th>RUNNING</th>
+                                    <th>STANDBY / IDLE</th>
+                                    <th>AVG THERMAL</th>
+                                    <th>AVG VIBRATION</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dept-table-body">
+                                <tr><td colspan="6" class="loading-td">Aggregating department metrics...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Production & Telemetry Trends (Stacked Charts) -->
+                <div class="charts-stack" id="section-charts">
+                    <div class="panel-box chart-sub">
+                        <div class="panel-head-bar">
+                            <span class="p-title">THERMAL & VIBRATION LOAD RECORDER</span>
+                            <span class="p-meta">CYCLE-AGGREGATED SENSOR STRIP CHART</span>
+                        </div>
+                        <div class="chart-canvas-wrap">
+                            <canvas id="telemetryChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="panel-box chart-sub">
+                        <div class="panel-head-bar">
+                            <span class="p-title">EQUIPMENT VELOCITY PROFILE (RPM)</span>
+                            <span class="p-meta">SPINDLE / FEED OUTPUT SNAPSHOT</span>
+                        </div>
+                        <div class="chart-canvas-wrap">
+                            <canvas id="spindleChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Department Production Summary (Simulated Shift Production) -->
+            <div class="panel-box" style="margin-top: 8px;">
+                <div class="panel-head-bar">
+                    <span class="p-title">DEPARTMENT PRODUCTION SUMMARY [SIMULATED SHIFT PRODUCTION]</span>
+                    <span class="p-meta">OUTPUT TARGETS, ACTUAL YIELD & REJECTED SCRAP (SHIFT 1)</span>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table" id="production-summary-table">
+                        <thead>
+                            <tr>
+                                <th>MANUFACTURING DEPARTMENT</th>
+                                <th style="width: 80px;">ASSETS</th>
+                                <th style="width: 120px;">TARGET OUTPUT</th>
+                                <th style="width: 120px;">ACTUAL OUTPUT</th>
+                                <th style="width: 130px;">REJECTED (SCRAP)</th>
+                                <th style="width: 100px;">SCRAP RATE</th>
+                                <th style="width: 220px;">SHIFT TARGET PROGRESS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="production-table-body">
+                            <tr><td colspan="7" class="loading-td">Calculating simulated shift output...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================================================================
+             SECTION 2: MACHINE MATRIX
+             ================================================================== -->
+        <section id="view-matrix" class="view-panel">
+            <div class="matrix-layout">
+                <!-- Main Equipment Table (Dense, Readable, Practical) -->
+                <div class="panel-box matrix-main-panel" id="section-machines">
+                    <div class="panel-head-bar">
+                        <span class="p-title">EQUIPMENT TELEMETRY MATRIX</span>
+                        <span class="p-meta">SELECT ANY EQUIPMENT ROW TO INSPECT TELEMETRY HISTORY</span>
+                    </div>
+
+                    <!-- Search and Filters Bar -->
+                    <div class="matrix-filter-bar">
+                        <div class="search-wrap">
+                            <span class="search-label">SEARCH:</span>
+                            <input type="text" id="matrix-search-input" class="search-input" placeholder="Filter equipment name, model, or tag...">
+                        </div>
+                        <div class="chip-group">
+                            <span class="chip-label">DEPT:</span>
+                            <button class="filter-chip active" data-dept-filter="all">ALL (6)</button>
+                            <button class="filter-chip" data-dept-filter="Welding & Fabrication">WELDING</button>
+                            <button class="filter-chip" data-dept-filter="Assembly">ASSEMBLY</button>
+                            <button class="filter-chip" data-dept-filter="Quality Inspection">QUALITY</button>
+                        </div>
+                        <div class="chip-group">
+                            <span class="chip-label">STATE:</span>
+                            <button class="status-chip active" data-state-filter="all">ALL</button>
+                            <button class="status-chip" data-state-filter="RUNNING">RUNNING</button>
+                            <button class="status-chip" data-state-filter="IDLE">IDLE</button>
+                            <button class="status-chip" data-state-filter="WARNING">WARNING</button>
+                        </div>
+                    </div>
+
+                    <!-- Dense Equipment Matrix Table -->
+                    <div class="table-wrap" id="departments-container">
+                        <!-- Rendered by app.js -->
+                    </div>
+                </div>
+
+                <!-- Detailed Side Panel / Inspector Drawer -->
+                <aside class="panel-box matrix-inspector-drawer" id="machine-inspector-drawer">
+                    <div class="panel-head-bar drawer-head">
+                        <span class="p-title" id="inspector-machine-title">EQUIPMENT INSPECTOR</span>
+                        <button class="btn-drawer-close" id="btn-close-inspector" title="Close Drawer">×</button>
+                    </div>
+                    <div class="drawer-body" id="inspector-content">
+                        <div class="empty-inspector-msg">
+                            Click any equipment row in the matrix to inspect live parameters and telemetry history.
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- ==================================================================
+             SECTION 3: ALARMS & EVENTS
+             ================================================================== -->
+        <section id="view-alarms" class="view-panel">
+            <div class="panel-box">
+                <div class="panel-head-bar">
+                    <span class="p-title">ALARMS & FAULT EVENT MANAGEMENT</span>
+                    <span class="p-meta">REAL-TIME OPERATIONAL EXCEPTIONS & EVENT ACKNOWLEDGEMENT</span>
+                </div>
+
+                <!-- Alarm Filter Controls -->
+                <div class="alarm-filter-bar">
+                    <div class="chip-group">
+                        <span class="chip-label">SEVERITY:</span>
+                        <button class="alarm-sev-btn active" data-sev="all">ALL SEVERITIES</button>
+                        <button class="alarm-sev-btn" data-sev="WARNING">WARNINGS</button>
+                        <button class="alarm-sev-btn" data-sev="INFO">INFO</button>
+                    </div>
+                    <div class="chip-group">
+                        <span class="chip-label">STATUS:</span>
+                        <button class="alarm-st-btn active" data-status="all">ALL EVENTS</button>
+                        <button class="alarm-st-btn" data-status="ACTIVE">ACTIVE</button>
+                        <button class="alarm-st-btn" data-status="ACKNOWLEDGED">ACKNOWLEDGED</button>
+                        <button class="alarm-st-btn" data-status="RESOLVED">RESOLVED</button>
+                    </div>
+                </div>
+
+                <!-- Structured Alarm Table -->
+                <div class="table-wrap">
+                    <table class="data-table" id="alarms-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 70px;">REF</th>
+                                <th style="width: 100px;">SEVERITY</th>
+                                <th style="width: 130px;">TIMESTAMP</th>
+                                <th style="width: 190px;">EQUIPMENT</th>
+                                <th style="width: 130px;">ALARM CODE</th>
+                                <th>DESCRIPTION</th>
+                                <th style="width: 110px;">STATUS</th>
+                                <th style="width: 140px; text-align: right;">ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alarms-table-body">
+                            <tr><td colspan="8" class="loading-td">Loading alarms and event buffer...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Historical Activity Stream Table -->
+            <div class="panel-box" id="section-activity" style="margin-top: 8px;">
+                <div class="panel-head-bar">
+                    <span class="p-title">CHRONOLOGICAL TELEMETRY STREAM LOG</span>
+                    <span class="p-meta">RECENT SENSOR AUDIT BUFFER</span>
+                </div>
+                <div class="table-wrap" style="max-height: 220px; overflow-y: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 130px;">TIMESTAMP</th>
+                                <th style="width: 200px;">EQUIPMENT SPECIFICATION</th>
+                                <th style="width: 170px;">DEPARTMENT</th>
+                                <th style="width: 120px;">VELOCITY (RPM)</th>
+                                <th style="width: 110px;">THERMAL (°C)</th>
+                                <th style="width: 110px;">VIBRATION</th>
+                                <th style="width: 100px;">STATE</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activity-table-body">
+                            <tr><td colspan="7" class="loading-td">Synchronizing telemetry stream...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================================================================
+             SECTION 4: MAINTENANCE LOGS
+             ================================================================== -->
+        <section id="view-maintenance" class="view-panel">
+            <div class="panel-box">
+                <div class="panel-head-bar">
+                    <span class="p-title">EQUIPMENT MAINTENANCE & DOWNTIME TRACKER</span>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span class="p-meta" id="maint-downtime-summary">TOTAL DOWNTIME: -- MINS</span>
+                        <button class="btn-sync" id="btn-open-log-modal" style="background:#002D62; border-color:#002D62; color:#fff; font-size:0.75rem; padding:4px 10px;">+ RECORD MAINTENANCE</button>
+                    </div>
+                </div>
+
+                <!-- Maintenance Filter Controls -->
+                <div class="alarm-filter-bar">
+                    <div class="chip-group">
+                        <span class="chip-label">CATEGORY:</span>
+                        <button class="maint-type-btn active" data-mtype="all">ALL CATEGORIES</button>
+                        <button class="maint-type-btn" data-mtype="PREVENTIVE">PREVENTIVE</button>
+                        <button class="maint-type-btn" data-mtype="CORRECTIVE">CORRECTIVE</button>
+                        <button class="maint-type-btn" data-mtype="TOOL_CHANGE">TOOL CHANGE</button>
+                        <button class="maint-type-btn" data-mtype="INSPECTION">INSPECTION</button>
+                        <button class="maint-type-btn" data-mtype="CALIBRATION">CALIBRATION</button>
+                    </div>
+                </div>
+
+                <!-- Maintenance Table -->
+                <div class="table-wrap">
+                    <table class="data-table" id="maintenance-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 70px;">REF</th>
+                                <th style="width: 140px;">TIMESTAMP</th>
+                                <th style="width: 200px;">EQUIPMENT SPECIFICATION</th>
+                                <th style="width: 160px;">DEPARTMENT</th>
+                                <th style="width: 130px;">CATEGORY</th>
+                                <th style="width: 110px;">DOWNTIME</th>
+                                <th style="width: 130px;">TECHNICIAN</th>
+                                <th>WORK PERFORMED / DESCRIPTION</th>
+                                <th style="width: 100px;">STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="maintenance-table-body">
+                            <tr><td colspan="9" class="loading-td">Loading maintenance records...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Maintenance Record Modal Dialog -->
+        <div class="hmi-modal-backdrop" id="modal-maintenance-backdrop" style="display:none;">
+            <div class="hmi-modal">
+                <div class="hmi-modal-header">
+                    <span class="modal-title">RECORD EQUIPMENT MAINTENANCE / DOWNTIME</span>
+                    <button class="btn-drawer-close" id="btn-close-modal" type="button">×</button>
+                </div>
+                <form id="form-record-maintenance" class="hmi-modal-body">
+                    <div class="form-row">
+                        <label class="form-label" for="maint-machine-select">EQUIPMENT TARGET:</label>
+                        <select id="maint-machine-select" class="form-select" required>
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label" for="maint-type-select">MAINTENANCE CATEGORY:</label>
+                        <select id="maint-type-select" class="form-select" required>
+                            <option value="PREVENTIVE">PREVENTIVE MAINTENANCE</option>
+                            <option value="CORRECTIVE">CORRECTIVE REPAIR</option>
+                            <option value="TOOL_CHANGE">TOOL / FIXTURE CHANGE</option>
+                            <option value="INSPECTION">INSPECTION & SAFETY CHECK</option>
+                            <option value="CALIBRATION">SENSOR / PROBE CALIBRATION</option>
+                            <option value="EMERGENCY">EMERGENCY STOP RECOVERY</option>
+                        </select>
+                    </div>
+                    <div class="form-row-grid">
+                        <div class="form-row">
+                            <label class="form-label" for="maint-downtime-input">DOWNTIME (MINUTES):</label>
+                            <input type="number" id="maint-downtime-input" class="form-input" min="0" value="30" required>
+                        </div>
+                        <div class="form-row">
+                            <label class="form-label" for="maint-tech-input">TECHNICIAN NAME:</label>
+                            <input type="text" id="maint-tech-input" class="form-input" placeholder="e.g. K. Takahashi" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label" for="maint-desc-input">WORK PERFORMED / ACTION TAKEN:</label>
+                        <textarea id="maint-desc-input" class="form-textarea" rows="3" placeholder="Describe calibration, part replacement or maintenance action taken..." required></textarea>
+                    </div>
+                    <div class="hmi-modal-footer">
+                        <button type="button" class="btn-cancel" id="btn-cancel-modal">CANCEL</button>
+                        <button type="submit" class="btn-submit-maint">SAVE RECORD TO SQLITE</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Engineering Console Footer -->
+        <footer class="hmi-footer">
+            <div class="footer-left">
+                <strong>KOM-MICS MIERUKA INDUSTRIAL MONITOR</strong> | INDEPENDENT ACADEMIC RESEARCH PROTOTYPE | NOT AFFILIATED WITH OR ENDORSED BY KOMATSU LTD.
+            </div>
+            <div class="footer-right">
+                STACK: PYTHON 3.12 / FLASK / SQLITE (WAL) | DISCIPLINE: CSE SMART FACTORY RESEARCH
+            </div>
+        </footer>
+    </div>
+
+    <!-- Application Script -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
