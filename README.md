@@ -66,10 +66,11 @@ The application is structured into a robust **4-Tier Cyber-Physical Topology**:
 
 ---
 
-## 5. Formal University Internship Report Deliverables
+## 5. Formal University Internship Deliverables
 
-Included within this repository is the complete, publication-grade academic report prepared for university submission:
+Included within this repository are the complete, publication-grade academic report and presentation files prepared for university submission:
 
+### Academic Report
 * **[SMART_FACTORY_MONITORING_SYSTEM_INTERNSHIP_REPORT.pdf](SMART_FACTORY_MONITORING_SYSTEM_INTERNSHIP_REPORT.pdf):**  
   * **Length:** Exactly **60 pages** (10 Preliminary Pages + 50 Arabic Chapter Pages).
   * **Typography & Layout:** Adheres strictly to Crescent Institute format and the reference layout of `Musawwir1010.pdf`.
@@ -78,6 +79,13 @@ Included within this repository is the complete, publication-grade academic repo
   * **Official Certificate:** Page ii embeds the original signed Komatsu India Internship Certificate.
 * **[SMART_FACTORY_MONITORING_SYSTEM_INTERNSHIP_REPORT.docx](SMART_FACTORY_MONITORING_SYSTEM_INTERNSHIP_REPORT.docx):**  
   * Fully formatted, editable Microsoft Word document matching the PDF layout with customized styles, cell margins, and header tables.
+
+### Viva & Defense Presentation (10 Slides)
+* **[Ayaan_Internship_Presentation.pptx](Ayaan_Internship_Presentation.pptx):**  
+  * Official 10-slide presentation built from the university template and styled in official Komatsu Blue (`#002D62`).
+  * Features the 6-department observational exposure matrix, verified system architecture, source code structure, and embedded certificate.
+* **[Ayaan_Internship_Presentation.pdf](Ayaan_Internship_Presentation.pdf):**  
+  * 16:9 widescreen ($960 \times 540\text{ pt}$) presentation export ready for review and viva projection.
 
 ---
 
@@ -153,6 +161,8 @@ KOM-MICS-Smart-Factory-Monitoring/
 │
 ├── SMART_FACTORY_MONITORING_SYSTEM_INTERNSHIP_REPORT.pdf  # Final 60-page PDF internship report
 ├── SMART_FACTORY_MONITORING_SYSTEM_INTERNSHIP_REPORT.docx # Final editable Word report
+├── Ayaan_Internship_Presentation.pptx                    # Official 10-slide PowerPoint presentation
+├── Ayaan_Internship_Presentation.pdf                     # Final 16:9 widescreen presentation PDF
 │
 ├── report_assets/                                        # Architecture diagrams, charts & UI screenshots
 │   ├── komatsu_logo.png
